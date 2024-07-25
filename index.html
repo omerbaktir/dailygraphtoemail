@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Project Name</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <style>
-        body { font-family: 'Roboto', sans-serif; line-height: 1.6; padding: 20px; }
-        .header, .footer { background: #f8f9fa; padding: 10px 20px; text-align: center; }
-        .content { margin: 20px 0; }
+        body { font-family: 'Roboto', sans-serif; line-height: 1.6; padding: 20px 50px; }
+        .header, .footer { background: linear-gradient(to right, #8145d1 0%, #cc8245 100%); padding: 10px 20px; text-align: center; color: white; }
+        .content { margin: 20px auto; max-width: 1200px; }
         .section { margin-bottom: 20px; }
-        img { max-width: 100%; height: auto; }
-        iframe { width: 100%; height: 350px; }
+        h1, h2, h3 { font-weight: 700; }
+        img, iframe { max-width: 100%; height: auto; }
         nav { text-align: center; margin-top: 10px; }
-        nav a { margin: 0 10px; text-decoration: none; color: #333; font-weight: bold;}
-        .top-left-image {position: absolute;top: 50px;left: 400px;}
+        nav a { margin: 0 10px; text-decoration: none; color: inherit; font-weight: bold; }
+        .top-left-image { position: absolute; top: 45px; left: 400px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -22,10 +23,10 @@
         <img src="images/projecticon.png" alt="Top Left Image">
     </div>
     <div class="header">
-        <h1>Daily graph from RDBMS to email using AWS Services</h1>
+        <h1>Daily graph from RDBMS to Email using AWS Services</h1>
         <nav>
             <a href="#about">About</a>
-            <a href="#step1">Step 1 - RDMBS to Lambda</a>
+            <a href="#step1">Step 1 - Creating DB on Heroku</a>
             <a href="#documentation">Documentation</a>
             <a href="#contact">Contact</a>
         </nav>
@@ -37,17 +38,44 @@
             <p>I developed this project to make it easier for the finance department to get daily sales graphs. It's designed to be flexible, handling various data requests seamlessly. Every day, the team accesses up-to-date reports and the associated CSVs and images stored on S3.</p>
             <p>To achieve this, I utilized six AWS services—Lambda, EC2, S3, SES, EventBridge, and IAM for role management—along with Heroku PostgreSQL. Opting for an external database with Heroku PostgreSQL alongside AWS allowed us to enhance the flexibility of our data management setup.</p>
             <p>Initially, I started with Lambda but soon encountered limitations related to size and compatibility issues with matplotlib. Switching to an EC2 instance solved these problems and also provided a scalable solution for future tasks. Now, every weekday morning, each department member receives an email with the latest graph. This simple yet effective change has streamlined our decision-making process, keeping everyone informed and aligned.</p>
+            <img src="images/v01.drawio.png" alt="Organizational chart of the services showing all tables and relationships" style="max-width:100%; height:auto; background-color:#333;">
+            <p>This diagram shows the structure of my project with all the AWS services and their relationships. It’s a handy reference for understanding how my services is organized and interconnected.</p>
         </div>
-        
 
         <div id="step1" class="section">
-            <h2>Step I</h2>
-            <p>Watch this short demo to see the project in action.</p>
-            <!-- Replace "YOUR_VIDEO_ID" with your actual YouTube video ID -->
-            <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <h2>Step 1</h2>
+            <p>For this project, I decided to use the Microsoft Adventure Works database. It’s originally built for MS SQL Server and is perfect for showing off what a real e-commerce operation might look like. I had to shift this over to Heroku PostgreSQL, which was a bit of a challenge, but using pgAdmin helped me get all 29 tables set up using CSV files.</p>
+            <p>The database is really the backbone of our application. It has everything from inventory management to customer interactions, and each table has its own set of rules to make sure the data stays clean and useful. I went with Adventure Works because it's complex enough to really demonstrate what you can do with advanced SQL and proper database management in a real-world business context.</p>
+            <p>Let's start with a code that is used for a table. This is used to create a table and all the column properties are mentioned</p>
+            
+            <pre><code class="language-sql">
+    CREATE TABLE DimReseller (
+        ResellerKey SERIAL PRIMARY KEY,
+        GeographyKey INT,
+        ResellerAlternateKey VARCHAR(15),
+        Phone VARCHAR(25),
+        BusinessType VARCHAR(20) NOT NULL,
+        ResellerName VARCHAR(50) NOT NULL,
+        NumberEmployees INT,
+        OrderFrequency CHAR(1),
+        OrderMonth SMALLINT,
+        FirstOrderYear INT,
+        LastOrderYear INT,
+        ProductLine VARCHAR(50),
+        AddressLine1 VARCHAR(60),
+        AddressLine2 VARCHAR(60),
+        AnnualSales MONEY,
+        BankName VARCHAR(50),
+        MinPaymentType SMALLINT,
+        MinPaymentAmount MONEY,
+        AnnualRevenue MONEY,
+        YearOpened INT
+    );
+            </code></pre>
+            <img src="your-image-name.jpg" alt="Descriptive Alt Text">
         </div>
 
-        <div id="documentation" class="section">
+        <div id="documentation" the-section">
             <h2>Documentation</h2>
             <p>Detailed documentation on how to set up and use the project...</p>
         </div>
@@ -61,5 +89,8 @@
     <div class="footer">
         <p>Copyright &copy; 2023 Your Name</p>
     </div>
+    <!-- Include Prism.js JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-sql.min.js"></script>
 </body>
 </html>
