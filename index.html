@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Project Name</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <style>
         body { font-family: 'Roboto', sans-serif; line-height: 1.6; padding: 20px 50px; }
         .header, .footer { background: linear-gradient(to right, #8145d1 0%, #cc8245 100%); padding: 10px 20px; text-align: center; color: white; }
@@ -15,7 +15,7 @@
         img, iframe { max-width: 100%; height: auto; }
         nav { text-align: center; margin-top: 10px; }
         nav a { margin: 0 10px; text-decoration: none; color: inherit; font-weight: bold; }
-        .top-left-image { position: absolute; top: 45px; left: 400px; border-radius: 5px; }
+        .top-left-image { position: absolute; top: 45px; left: 200px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -27,7 +27,9 @@
         <nav>
             <a href="#about">About</a>
             <a href="#step1">Step 1 - Creating DB on Heroku</a>
-            <a href="#documentation">Documentation</a>
+            <a href="#step2">Step 2 - RDBMS to S3 using Lambda</a>
+            <a href="#step3">Step 3 - Drawing graphs on EC2</a>
+            <a href="#step4">Step 4 - Sending email to team</a>
             <a href="#contact">Contact</a>
         </nav>
     </div>
@@ -43,41 +45,71 @@
         </div>
 
         <div id="step1" class="section">
-            <h2>Step 1</h2>
+            <h2>Step 1 - Creating DB on Heroku</h2>
             <p>For this project, I decided to use the Microsoft Adventure Works database. It’s originally built for MS SQL Server and is perfect for showing off what a real e-commerce operation might look like. I had to shift this over to Heroku PostgreSQL, which was a bit of a challenge, but using pgAdmin helped me get all 29 tables set up using CSV files.</p>
             <p>The database is really the backbone of our application. It has everything from inventory management to customer interactions, and each table has its own set of rules to make sure the data stays clean and useful. I went with Adventure Works because it's complex enough to really demonstrate what you can do with advanced SQL and proper database management in a real-world business context.</p>
             <p>Let's start with a code that is used for a table. This is used to create a table and all the column properties are mentioned</p>
             
             <pre><code class="language-sql">
-    CREATE TABLE DimReseller (
-        ResellerKey SERIAL PRIMARY KEY,
-        GeographyKey INT,
-        ResellerAlternateKey VARCHAR(15),
-        Phone VARCHAR(25),
-        BusinessType VARCHAR(20) NOT NULL,
-        ResellerName VARCHAR(50) NOT NULL,
-        NumberEmployees INT,
-        OrderFrequency CHAR(1),
-        OrderMonth SMALLINT,
-        FirstOrderYear INT,
-        LastOrderYear INT,
-        ProductLine VARCHAR(50),
-        AddressLine1 VARCHAR(60),
-        AddressLine2 VARCHAR(60),
-        AnnualSales MONEY,
-        BankName VARCHAR(50),
-        MinPaymentType SMALLINT,
-        MinPaymentAmount MONEY,
-        AnnualRevenue MONEY,
-        YearOpened INT
-    );
+CREATE TABLE DimReseller (
+    ResellerKey SERIAL PRIMARY KEY,
+    GeographyKey INT,
+    ResellerAlternateKey VARCHAR(15),
+    Phone VARCHAR(25),
+    BusinessType VARCHAR(20) NOT NULL,
+    ResellerName VARCHAR(50) NOT NULL,
+    NumberEmployees INT,
+    MinPaymentAmount MONEY,
+    #add other 12 columns
+);
             </code></pre>
-            <img src="your-image-name.jpg" alt="Descriptive Alt Text">
+            <p>Here I had to do some modifications because CSV files already had primary key. So i chnaged ResellerKey to
+                ResellerKey INT PRIMARY KEY before I uploaded CSV to the table.</p>
+            <p><a href="https://github.com/jkehler/awslambda-psycopg2">The code for creating all tables is here</a></p>
+            <p>There are 29 tables in the DB so I had to do this for all 29 of them. At the end I had all of them in the DB</p>
+            <img src="images/29table.png" alt="Descriptive Alt Text">
+            <p>Along the way I had to do some more altercations because the CSV files had some mismatches with the tables I 
+                created.</p>
+            <pre><code class="language-sql">
+ALTER TABLE newfactcurrencyrate
+ALTER COLUMN currencykey TYPE FLOAT;
+            </code></pre>
+            <p>All table creation codes can be found in the repo.</p>
         </div>
 
-        <div id="documentation" the-section">
-            <h2>Documentation</h2>
-            <p>Detailed documentation on how to set up and use the project...</p>
+        <div id="step2" class="section">
+            <h2>Step 2 - RDBMS to S3 using Lambda</h2>
+            <p>The first part of the code was to extract data from a Postgres db by running a query and saving results as csv. This task is going to be repeated everyday. I will explain how that part of the task was achieved later in the project.  </p>
+            <p>When I tried to use site packages of psycopg2 I had issues until I found this helpful github repo on <a href="https://github.com/jkehler/awslambda-psycopg2">jkehler/awslambda-psycopg2</a> . They solved the issue by compiling psycopg2 with the PostgreSQL libpq.so library instead of the default dynamic link.</p> 
+            <p>I used the psycopg2-3.11 version and created a lambda function with the same configuration. I also used the AWSSDKPandas-Python311 layer. You should create a layer to access the pandas library. </p>
+            <p>Here is important parts of the the code for the lambda function I used. You can get the entire code here:</p>
+            <p><a href="https://github.com/jkehler/awslambda-psycopg2">jkehler/awslambda-psycopg2</a></p>
+            <pre><code class="language-python">
+# import boto3,json,pandas,psycopg2,io,datetime and os 
+# define lambda handler with DB parameters
+# set up the connection
+# execute the query
+        cursor.execute("SELECT city, sum(yearlyincome) as avg_income FROM prospectivebuyer group by city order by avg_income desc limit 10;")
+# fetch result and convert to a DataFrame and save as csv
+# Create an S3 client
+        s3_client = boto3.client('s3')
+        today_date = datetime.now().strftime('%Y-%m-%d')
+        
+#Here I used datetime function to get date later on to use as a filename. 
+# Upload CSV to S3
+        bucket_name = 'yourbucket'
+        object_name = f'graphs/sales_daily_{today_date}.csv'
+#Since this process is going to be repeated I want an automated name for eveyday's file.
+# Close the cursor and connection
+# Return the result as JSON
+        </code></pre>
+        <h3>Notes on the code:</h3>
+        <p></p>
+        </div>
+
+        <div id="step3" class="section">
+            <h2>Step 3 - RDBMS to S3 using Lambda</h2>
+            <p>Step 3</p>
         </div>
 
         <div id="contact" class="section">
@@ -90,7 +122,8 @@
         <p>Copyright &copy; 2023 Your Name</p>
     </div>
     <!-- Include Prism.js JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-sql.min.js"></script>
 </body>
 </html>
