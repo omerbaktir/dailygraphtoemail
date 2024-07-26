@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Project Name</title>
+    <title>AWS RDB to EMAIL</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <style>
@@ -16,6 +16,9 @@
         nav { text-align: center; margin-top: 10px; }
         nav a { margin: 0 10px; text-decoration: none; color: inherit; font-weight: bold; }
         .top-left-image { position: absolute; top: 45px; left: 200px; border-radius: 5px; }
+        .image-container {display: flex;align-items: flex-start;}
+        .left-image {margin-right: 10px; /* Adjust the margin as needed */}
+
     </style>
 </head>
 <body>
@@ -29,7 +32,7 @@
             <a href="#step1">Step 1 - Creating DB on Heroku</a>
             <a href="#step2">Step 2 - RDBMS to S3 using Lambda</a>
             <a href="#step3">Step 3 - Drawing graphs on EC2</a>
-            <a href="#step4">Step 4 - Sending email to team</a>
+            <a href="#step4">Step 4 - Email the graph</a>
             <a href="#contact">Contact</a>
         </nav>
     </div>
@@ -81,9 +84,12 @@ ALTER COLUMN currencykey TYPE FLOAT;
             <h2>Step 2 - RDBMS to S3 using Lambda</h2>
             <p>The first part of the code was to extract data from a Postgres db by running a query and saving results as csv. This task is going to be repeated everyday. I will explain how that part of the task was achieved later in the project.  </p>
             <p>When I tried to use site packages of psycopg2 I had issues until I found this helpful github repo on <a href="https://github.com/jkehler/awslambda-psycopg2">jkehler/awslambda-psycopg2</a> . They solved the issue by compiling psycopg2 with the PostgreSQL libpq.so library instead of the default dynamic link.</p> 
-            <p>I used the psycopg2-3.11 version and created a lambda function with the same configuration. I also used the AWSSDKPandas-Python311 layer. You should create a layer to access the pandas library. </p>
+            <h3>Set up environment for function:</h3>
+            <p>I used the <b>psycopg2-3.11</b> version and created a lambda function with the same configuration. 
+                I also used the <b>AWSSDKPandas-Python311</b> layer. You should <u>create a layer</u> to access the pandas library. </p>
+            <h3>Code:</h3>
             <p>Here is important parts of the the code for the lambda function I used. You can get the entire code here:</p>
-            <p><a href="https://github.com/jkehler/awslambda-psycopg2">jkehler/awslambda-psycopg2</a></p>
+            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/code/lambda_for_retrieving_data.py">Code for Lambda</a></p>
             <pre><code class="language-python">
 # import boto3,json,pandas,psycopg2,io,datetime and os 
 # define lambda handler with DB parameters
@@ -103,13 +109,100 @@ ALTER COLUMN currencykey TYPE FLOAT;
 # Close the cursor and connection
 # Return the result as JSON
         </code></pre>
-        <h3>Notes on the code:</h3>
-        <p></p>
+        <img src="images/iam.jpg" alt="Descriptive Alt Text" style="display: block; margin-left: auto; margin-right: auto;">
+        <h3>Creating a role for Lambda:</h3>
+        <p>Last thing but not the least about AWS lambda is that we need to create a role from IAM and 
+            attach this to the function. This function should be able to write to S3.
+        <p>
+            Lambda function needs a role to be able to write to S3 bucket. So I created an S3 access role in IAM (Identity Access Management) and allowed full access to the role. Then I attached this role to the function from Function > Configuration > General Configuration > Existing Role.
+            
+            At this point Lambda can read from the RDBMS and saves it to the defined bucket. Next step is to schedule this.
+        </p>
+        <p>I also increased the timeout to 10 secs and this can be adjusted according to the time code will need to run in order not to timeout.</p>
+        </p>
+        <img src="images/eventbridge.jpg" alt="Descriptive Alt Text" style="display: block; margin-left: auto; margin-right: auto;">
+        <h3>Scheduling Lambda:</h3>
+        <p>This is time to schedule the task. We need to use Event bridge and create schedule for this function.
+            I cretaed a schedule for this function to run everyday at 5 pm (this can be adjusted) to retrieve
+            the data and save it to S3.
+        </p>
         </div>
 
         <div id="step3" class="section">
-            <h2>Step 3 - RDBMS to S3 using Lambda</h2>
-            <p>Step 3</p>
+            <h2>Step 3 - Drawing graphs on EC2</h2>
+            <h3>Initial plan and adjustment:</h3>
+            <p>I was planning to use Lambda throuhout but Lambda could not handle matplotlib the way I expected.
+                When I tried using layers that I cretaed it was too large (larger than 250 Mb unzipped). This was
+                more than AWS allows even using S3 to store the layer. When I deleted some libraries pandas didn't
+                function well. I also tried to create libraries using manylinux wheels but I could not solve dependency 
+                issues. So I revised my plan. I decided to use EC2 and schedule EC2 to save costs.
+            </p>
+            <h3>Setting up EC2 and testing code locally (in EC2):</h3>
+            <p>I created an instance with minimal configurations. This task is not compute heavy and this instance can 
+                be used for other automation tasks. I used Amazon Linux. After creating the instance I tried the code locally.
+                I was able to save file locally.
+            </p>
+            <h3>Connection with S3:</h3>
+            <p>After testing locally I connected to S3 to read and write. As a part of this project we had to save files
+                on S3 to keep as further processing. All CSV files are stored by Lambda function and all images 
+                after drawing the graph are stored by EC2.
+            </p>
+            <p>To connect S3 we again need to use <b>IAM roles</b> and attach a role to EC2. This role has permission
+            to read and write permissions from S3</p>
+            <h3>Code for creating a graph using Pandas and Matplotlib:</h3>
+            <p>Here are some insights from code. Complete code can be found at: </p>
+            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/code/lambda_for_retrieving_data.py">Code for Drawing graph</a></p>
+            <pre><code class ="language-python" >
+# import pandas,matplotlib,boto3,BytesIO from io and datetime
+# Initialize a session on S3
+s3 = boto3.client('s3')
+# Today's date for dynamic file access and saving
+today = datetime.now().strftime("%Y-%m-%d")
+# Bucket and object key for reading the CSV dynamically based on today's date
+bucket_name = 'yourbucket'
+object_key = f'graphs/sales_daily_{today}.csv'
+# Get the object from the bucket
+obj = s3.get_object(Bucket=bucket_name, Key=object_key)
+# Read data from the object's body directly into a DataFrame
+data = pd.read_csv(BytesIO(obj['Body'].read()))
+# Plotting the bar graph and formatting
+# Format y-axis to display values in a readable format
+plt.gca().get_yaxis().set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:,}".format(int(x))))
+# Save the plot to a BytesIO object
+img_data = BytesIO()
+plt.savefig(img_data, format='png')
+img_data.seek(0)  # Rewind the BytesIO object
+# Upload the image to S3
+upload_bucket = 'uploadbucket'
+upload_key = f'plots/daily_graph_{today}.png'  # You can change the directory structure if needed
+s3.put_object(Bucket=upload_bucket, Key=upload_key, Body=img_data, ContentType='image/png')
+            </code></pre>
+            <h3>Scheduling the task using crontab:</h3>
+            <p>I had to schedule this task using crontab. EC2 is going to be active certain times of the day
+                to save costs and cron will automate the job. Here is the cron I used:
+            </p>
+            <img src="images/crontab.png" alt="Descriptive Alt Text">
+            <p>This code means this task will be repeated everyday at 21:06 and one more detail: If you do not set up
+                <b>Amazon Linux uses UTC.</b> So I had to adjust the timing according to that.
+            </p>
+        </div>
+        <img src="images/Amazon-SES.png" alt="Descriptive Alt Text" style="display: block; margin-left: auto; margin-right: auto;">
+        <div id="step4" class="section">
+            <h2>Step 4 - Email the graph</h2>
+            <h3>Setting up SES:</h3>
+            <p>This AWS Service needs more set up than other services. You need the register your email and also
+                a domain if possible. I have my own domain so I registered both. For email you get a confirmation
+                email and it is done. For domain you need to add keys to your DNS on domain providers site. After that
+                are still in sandbox and you need to request for AWS to take you out of sandbox.
+            </p>
+            <p>You can only send to registered emails in sandbox with a limit of 200 emails/day and 1 email/second.</p>
+            <p>I requested for that and it took around a day to get approved.</p>
+            <h3>Setting up Lambda function to send emails:</h3>
+            <p>We need another function to send emails to the team. Whenever EC2 is done with the graph,
+                this lambda function will be triggered and send an email with a predefined text to team members
+                with the graph attached. This lambda fuction also needs permission for S3 and SES. These can be cretaed 
+                in IAM and attached to the function.
+            </p>
         </div>
 
         <div id="contact" class="section">
