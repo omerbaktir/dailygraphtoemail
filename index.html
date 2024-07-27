@@ -15,7 +15,7 @@
         img, iframe { max-width: 100%; height: auto; }
         nav { text-align: center; margin-top: 10px; }
         nav a { margin: 0 10px; text-decoration: none; color: inherit; font-weight: bold; }
-        .top-left-image { position: absolute; top: 45px; left: 120px; border-radius: 5px; }
+        .top-left-image { position: absolute; top: 45px; left: 100px; border-radius: 5px; }
         .image-container {display: flex;align-items: flex-start;}
         .left-image {margin-right: 10px; /* Adjust the margin as needed */}
         .section-divider {border: 0;height: 10px;background-color: orange; /* Adjust the color as needed */margin-top: 20px; /* Adjust the spacing as needed */
@@ -154,7 +154,7 @@ ALTER COLUMN currencykey TYPE FLOAT;
             to read and write permissions from S3</p>
             <h3>Code for creating a graph using Pandas and Matplotlib:</h3>
             <p>Here are some insights from code. Complete code can be found at: </p>
-            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/code/lambda_for_retrieving_data.py">Code for Drawing graph</a></p>
+            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/code/draw_graph.py">Code for Drawing graph</a></p>
             <pre><code class ="language-python" >
 # import pandas,matplotlib,boto3,BytesIO from io and datetime
 # Initialize a session on S3
@@ -237,7 +237,7 @@ def lambda_handler(event, context):
                 in IAM and attached to the function.
             </p>
             <p>Here is the fuction to send emails. Complete code can be found at:</p>
-            <p><a href="">Code for sending emails</a></p>
+            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/code/lambda_for_sendin_email.py">Code for sending emails</a></p>
             <pre><code class = "language-python">
 #import boto3,base64,os,...
 #define lambda_handler with s3 and ses clients
