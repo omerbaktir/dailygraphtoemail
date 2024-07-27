@@ -15,9 +15,12 @@
         img, iframe { max-width: 100%; height: auto; }
         nav { text-align: center; margin-top: 10px; }
         nav a { margin: 0 10px; text-decoration: none; color: inherit; font-weight: bold; }
-        .top-left-image { position: absolute; top: 45px; left: 200px; border-radius: 5px; }
+        .top-left-image { position: absolute; top: 45px; left: 120px; border-radius: 5px; }
         .image-container {display: flex;align-items: flex-start;}
         .left-image {margin-right: 10px; /* Adjust the margin as needed */}
+        .section-divider {border: 0;height: 10px;background-color: orange; /* Adjust the color as needed */margin-top: 20px; /* Adjust the spacing as needed */
+    margin-bottom: 40px; /* Adjust the spacing as needed */}
+
 
     </style>
 </head>
@@ -46,7 +49,7 @@
             <img src="images/v01.drawio.png" alt="Organizational chart of the services showing all tables and relationships" style="max-width:100%; height:auto; background-color:#333;">
             <p>This diagram shows the structure of my project with all the AWS services and their relationships. It’s a handy reference for understanding how my services is organized and interconnected.</p>
         </div>
-
+        <hr class="section-divider">
         <div id="step1" class="section">
             <h2>Step 1 - Creating DB on Heroku</h2>
             <p>For this project, I decided to use the Microsoft Adventure Works database. It’s originally built for MS SQL Server and is perfect for showing off what a real e-commerce operation might look like. I had to shift this over to Heroku PostgreSQL, which was a bit of a challenge, but using pgAdmin helped me get all 29 tables set up using CSV files.</p>
@@ -79,7 +82,7 @@ ALTER COLUMN currencykey TYPE FLOAT;
             </code></pre>
             <p>All table creation codes can be found in the repo.</p>
         </div>
-
+        <hr class="section-divider">
         <div id="step2" class="section">
             <h2>Step 2 - RDBMS to S3 using Lambda</h2>
             <p>The first part of the code was to extract data from a Postgres db by running a query and saving results as csv. This task is going to be repeated everyday. I will explain how that part of the task was achieved later in the project.  </p>
@@ -127,7 +130,7 @@ ALTER COLUMN currencykey TYPE FLOAT;
             the data and save it to S3.
         </p>
         </div>
-
+        <hr class="section-divider">
         <div id="step3" class="section">
             <h2>Step 3 - Drawing graphs on EC2</h2>
             <h3>Initial plan and adjustment:</h3>
@@ -183,9 +186,39 @@ s3.put_object(Bucket=upload_bucket, Key=upload_key, Body=img_data, ContentType='
             </p>
             <img src="images/crontab.png" alt="Descriptive Alt Text">
             <p>This code means this task will be repeated everyday at 21:06 and one more detail: If you do not set up
-                <b>Amazon Linux uses UTC.</b> So I had to adjust the timing according to that.
-            </p>
+                <b>Amazon Linux uses UTC.</b> So I had to adjust the timing according to that.</p>
+            <p>Now the graph is stored in S3 with a unique name for the day.</p>
+            <h3>Managing EC2 with scheduled start and stop times:</h3>
+            <p>EC2 can run whole day if necessary but we pay as much hours as we use. So, I decided to schedule this.
+                We can again use <b>Lambda with Event Bridge</b> to schedule this so we don't use EC2 unnecessarily.</p>
+            <p>Lambda code for starting and stopping EC2:</p>
+            <pre><code class = "language-python">
+import boto3
+def lambda_handler(event, context):
+    ec2 = boto3.client('ec2', region_name='your-region')  # Specify your region
+    instances = ['instance']  # Specify your instance ID
+    ec2.start_instances(InstanceIds=instances)
+    return {
+        'message': "EC2 instance started"
+    }
+            </code></pre>
+            <pre><code class = "language-python">
+import boto3
+def lambda_handler(event, context):
+    ec2 = boto3.client('ec2', region_name='your-region')  # Specify your region
+    instances = ['instance-id']  # Specify your instance ID
+    ec2.stop_instances(InstanceIds=instances)
+    return {
+        'message': "EC2 instance stopped"
+    }
+                            </code></pre>
+        <h3>Scheduling Lambda functions to start and stop EC2:</h3>
+        <p>After creating Lambda fucntions I scheduled them to start and stop using Event Bridge. I 
+            planned 45 minutes for EC2 to run but this time can be adjusted according to needs of company
+            and also for running multiple tasks on EC2. For high end instances it is important to manage run times.
+        </p>
         </div>
+        <hr class="section-divider">
         <img src="images/Amazon-SES.png" alt="Descriptive Alt Text" style="display: block; margin-left: auto; margin-right: auto;">
         <div id="step4" class="section">
             <h2>Step 4 - Email the graph</h2>
@@ -198,11 +231,34 @@ s3.put_object(Bucket=upload_bucket, Key=upload_key, Body=img_data, ContentType='
             <p>You can only send to registered emails in sandbox with a limit of 200 emails/day and 1 email/second.</p>
             <p>I requested for that and it took around a day to get approved.</p>
             <h3>Setting up Lambda function to send emails:</h3>
-            <p>We need another function to send emails to the team. Whenever EC2 is done with the graph,
-                this lambda function will be triggered and send an email with a predefined text to team members
+            <p>We need another function to send emails to the team. Whenever EC2 is done with the graph and image is stored
+                in S3. S3 triggres this lambda function and Lambda sends an email with a predefined text to team members
                 with the graph attached. This lambda fuction also needs permission for S3 and SES. These can be cretaed 
                 in IAM and attached to the function.
             </p>
+            <p>Here is the fuction to send emails. Complete code can be found at:</p>
+            <p><a href="">Code for sending emails</a></p>
+            <pre><code class = "language-python">
+#import boto3,base64,os,...
+#define lambda_handler with s3 and ses clients
+# Extract bucket name and key from the event
+# Get the file content from S3
+# Create a MIME multipart message (use a txt file to store email addresses in the directory with fuction)
+    with open('emails.txt', 'r') as file:
+        email_list = [line.strip() for line in file if line.strip()]
+    msg = MIMEMultipart()
+    msg['Subject'] = 'Daily Sales Graph'
+    msg['From'] = 'your@email.net'
+    msg['To'] = ', '.join(email_list)
+    # Attach text body
+    msg.attach(MIMEText('Here is the daily sales graph.', 'plain'))
+    # Attach the image
+    img = MIMEImage(file_content)
+    img.add_header('Content-Disposition', 'attachment', filename=key)
+    msg.attach(img)
+# Send the email
+    </code>
+            </pre>
         </div>
 
         <div id="contact" class="section">
