@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <style>
-        body { font-family: 'Roboto', sans-serif; line-height: 1.6; padding: 20px 50px; }
+        body { font-family: 'Roboto', sans-serif; line-height: 1.6; padding: 20px 50px; font-size: 18px;}
         .header, .footer { background: linear-gradient(to right, #8145d1 0%, #cc8245 100%); padding: 10px 20px; text-align: center; color: white; }
         .content { margin: 20px auto; max-width: 1200px; }
         .section { margin-bottom: 20px; }
@@ -35,8 +35,8 @@
             <a href="#step1">Step 1 - Creating DB on Heroku</a>
             <a href="#step2">Step 2 - RDBMS to S3 using Lambda</a>
             <a href="#step3">Step 3 - Drawing graphs on EC2</a>
-            <a href="#step4">Step 4 - Email the graph</a>
-            <a href="#contact">Contact</a>
+            <a href="#step4divider">Step 4 - Email the graph</a>
+            <a href="#step5divider">Screenshots from AWS</a>
         </nav>
     </div>
 
@@ -218,8 +218,8 @@ def lambda_handler(event, context):
             and also for running multiple tasks on EC2. For high end instances it is important to manage run times.
         </p>
         </div>
-        <hr class="section-divider">
-        <img src="images/Amazon-SES.png" alt="Descriptive Alt Text" style="display: block; margin-left: auto; margin-right: auto;">
+        <hr id ="step4divider" class="section-divider">
+        <img id = "image4" src="images/Amazon-SES.png" alt="Descriptive Alt Text" style="display: block; margin-left: auto; margin-right: auto;">
         <div id="step4" class="section">
             <h2>Step 4 - Email the graph</h2>
             <h3>Setting up SES:</h3>
@@ -260,15 +260,17 @@ def lambda_handler(event, context):
     </code>
             </pre>
         </div>
-
-        <div id="contact" class="section">
-            <h2>Contact</h2>
+        <hr id ="step5divider" class="section-divider">
+        <div id="screenshots" class="section">
+            <h2>Screenshots</h2>
+            <h3>Database overall</h3>
             <p>If you have any questions, please feel free to reach out to me at <a href="mailto:your.email@example.com">your.email@example.com</a>.</p>
+                   
         </div>
     </div>
 
     <div class="footer">
-        <p>Copyright &copy; 2023 Your Name</p>
+        <p>Copyright &copy; 2024 baktir.net</p>
     </div>
     <!-- Include Prism.js JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
