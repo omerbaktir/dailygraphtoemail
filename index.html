@@ -264,24 +264,47 @@ def lambda_handler(event, context):
         <hr id ="step5divider" class="section-divider">
         <div id="screenshots" class="section">
             <h2>Screenshots from AWS</h2>
-            <h3>Lambda1</h3>
-            <img src="images/crontab.png" alt="Descriptive Alt Text">
-            <img src="images/crontab.png" alt="Descriptive Alt Text">
-            <img src="images/crontab.png" alt="Descriptive Alt Text">
-            <p>dsfsdfdf</p>
+            <h3>Heroku Postgres</h3>
+            <img src="images/heroku_screenshot.png" alt="Descriptive Alt Text">
+            <h3>Lambda saves files everyday at same time</h3>
+            <img src="images/lambda_in_action.png" alt="Descriptive Alt Text">
+            <h3>Lambda dependencies to read from DB</h3>
+            <img src="images/lambda1_dependencies.png" alt="Descriptive Alt Text">
+            <h3>Lambda uses AWS defined layer</h3>
+            <img src="images/lambda1_settings_layer.png" alt="Descriptive Alt Text">
+            <h3>EC2 stopped while not used</h3>
+            <img src="images/ec2_stopped_state.png" alt="Descriptive Alt Text">
+            <h3>EC2 has permissions for S3</h3>
+            <img src="images/ec2_permission.png" alt="Descriptive Alt Text">
+            <h3>Event Bridge schedule to start EC2</h3>
+            <img src="images/event_bridge_start_ec2.png" alt="Descriptive Alt Text">
+            <h3>SES after production request</h3>
+            <img src="images/ses_aftersandbox.png" alt="Descriptive Alt Text">
                    
         </div>
         <hr id ="step6divider" class="section-divider">
         <div id="queries" class="section">
-            <h2>Some great queries to explore Data</h2>
+            <h2>Some great queries to explore the database</h2>
             <h3>Customer Age Analysis</h3>
             <p>Let's find out how many customers are there in age groups</p>
             <img src="images/q_age_groups.png" alt="Descriptive Alt Text">
             <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/queries/age_groups.sql">Query to get this result</a></p>
-            <h3>Another analysis</h3>
-            <p>Let's find out how many customers are there in age groups</p>
-            <img src="images/crontab.png" alt="Descriptive Alt Text">
-            <a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/queries/age_groups.sql">Query to get this result</a>     
+            <h3>Marital status and Income insights</h3>
+            <p>Let's find out average income according to marital status and house ownership</p>
+            <img src="images/q_income_and_house_maritals.png" alt="Descriptive Alt Text">
+            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/queries/marital_house_income.sql">Query to get this result</a></p>   
+            <h3>Education and Occupation</h3>
+            <p>Let's find out the most common occupation for each education level</p>
+            <img src="images/q_education_occupation.png" alt="Descriptive Alt Text">
+            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/queries/education_occupation.sql">Query to get this result</a></p>
+            <h3>Relation between occupation and commute</h3>
+            <p>Let's find out the average commute distance for each occupation. In DB commute was not numerical so 
+                I defined average distances for each category.
+            </p>
+            <img src="images/q_occupation_commute.png" alt="Descriptive Alt Text">
+            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/queries/avg_commute_per_occupation.sql">Query to get this result</a></p>
+        
+        
         </div>
     </div>
 
