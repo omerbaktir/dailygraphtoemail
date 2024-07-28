@@ -43,6 +43,7 @@ nav a { margin: 0 10px; text-decoration: none; color: inherit; font-weight: bold
     <div class="content">
         <div id="about" class="section">
             <h2>About This Project</h2>
+            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/">Github repository for the project</a></p>
             <p>I developed this project to make it easier for the finance department to get daily sales graphs. It's designed to be flexible, handling various data requests seamlessly. Every day, the team accesses up-to-date reports and the associated CSVs and images stored on S3.</p>
             <p>To achieve this, I utilized six AWS services—Lambda, EC2, S3, SES, EventBridge, and IAM for role management—along with Heroku PostgreSQL. Opting for an external database with Heroku PostgreSQL alongside AWS allowed us to enhance the flexibility of our data management setup.</p>
             <p>Initially, I started with Lambda but soon encountered limitations related to size and compatibility issues with matplotlib. Switching to an EC2 instance solved these problems and also provided a scalable solution for future tasks. Now, every weekday morning, each department member receives an email with the latest graph. This simple yet effective change has streamlined our decision-making process, keeping everyone informed and aligned.</p>
