@@ -7,29 +7,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <style>
-        body { font-family: 'Roboto', sans-serif; line-height: 1.6; padding: 20px 50px; font-size: 18px;}
-        .header, .footer { background: linear-gradient(to right, #8145d1 0%, #cc8245 100%); padding: 10px 20px; text-align: center; color: white; }
-        .content { margin: 20px auto; max-width: 1200px; }
-        .section { margin-bottom: 20px; }
-        h1, h2, h3 { font-weight: 700; }
-        img, iframe { max-width: 100%; height: auto; }
-        nav { text-align: center; margin-top: 10px; }
-        nav a { margin: 0 10px; text-decoration: none; color: inherit; font-weight: bold; }
-        .top-left-image { position: absolute; top: 45px; left: 100px; border-radius: 5px; }
-        .image-container {display: flex;align-items: flex-start;}
-        .left-image {margin-right: 10px; /* Adjust the margin as needed */}
-        .section-divider {border: 0;height: 10px;background-color: orange; /* Adjust the color as needed */margin-top: 20px; /* Adjust the spacing as needed */
-    margin-bottom: 40px; /* Adjust the spacing as needed */}
+        body { font-family: 'Roboto', sans-serif; line-height: 1.6; padding: 20px 50px; font-size: 18px; }
+.header, .footer { background: linear-gradient(to right, #8145d1 0%, #cc8245 100%); padding: 10px 20px; text-align: center; color: white; }
+.content { margin: 20px auto; max-width: 1200px; }
+.section { margin-bottom: 20px; }
+h1, h2, h3 { font-weight: 700; }
+img, iframe { max-width: 100%; height: auto; }
+nav { text-align: center; margin-top: 10px; }
+nav a { margin: 0 10px; text-decoration: none; color: inherit; font-weight: bold; }
+.top-left-content { display: flex; align-items: center; justify-content: center; text-align: left; width: 100%; }
+.header-image { max-width: 100px; height: auto; margin-right: 20px; }
+.section-divider { border: 0; height: 10px; background-color: orange; margin-top: 20px; margin-bottom: 40px; }
+
 
 
     </style>
 </head>
 <body>
-    <div class="top-left-image">
-        <img src="images/projecticon.png" alt="Top Left Image">
-    </div>
     <div class="header">
-        <h1>Daily graph from RDBMS to Email using AWS Services</h1>
+        <div class="top-left-content">
+            <img src="images/projecticon.png" alt="Top Left Image" class="header-image">
+            <h1>Daily graph from RDBMS to Email using AWS Services</h1>
+        </div>
         <nav>
             <a href="#about">About</a>
             <a href="#step1">Step 1 - Creating DB on Heroku</a>
@@ -37,6 +36,7 @@
             <a href="#step3">Step 3 - Drawing graphs on EC2</a>
             <a href="#step4divider">Step 4 - Email the graph</a>
             <a href="#step5divider">Screenshots from AWS</a>
+            <a href="#step6divider">Some great Queries</a>
         </nav>
     </div>
 
@@ -236,6 +236,7 @@ def lambda_handler(event, context):
                 with the graph attached. This lambda fuction also needs permission for S3 and SES. These can be cretaed 
                 in IAM and attached to the function.
             </p>
+            <p><b>You should provide emails as a text file in the same directory of your lambda file</b></p>
             <p>Here is the fuction to send emails. Complete code can be found at:</p>
             <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/code/lambda_for_sendin_email.py">Code for sending emails</a></p>
             <pre><code class = "language-python">
@@ -262,10 +263,25 @@ def lambda_handler(event, context):
         </div>
         <hr id ="step5divider" class="section-divider">
         <div id="screenshots" class="section">
-            <h2>Screenshots</h2>
-            <h3>Database overall</h3>
-            <p>If you have any questions, please feel free to reach out to me at <a href="mailto:your.email@example.com">your.email@example.com</a>.</p>
+            <h2>Screenshots from AWS</h2>
+            <h3>Lambda1</h3>
+            <img src="images/crontab.png" alt="Descriptive Alt Text">
+            <img src="images/crontab.png" alt="Descriptive Alt Text">
+            <img src="images/crontab.png" alt="Descriptive Alt Text">
+            <p>dsfsdfdf</p>
                    
+        </div>
+        <hr id ="step6divider" class="section-divider">
+        <div id="queries" class="section">
+            <h2>Some great queries to explore Data</h2>
+            <h3>Customer Age Analysis</h3>
+            <p>Let's find out how many customers are there in age groups</p>
+            <img src="images/q_age_groups.png" alt="Descriptive Alt Text">
+            <p><a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/queries/age_groups.sql">Query to get this result</a></p>
+            <h3>Another analysis</h3>
+            <p>Let's find out how many customers are there in age groups</p>
+            <img src="images/crontab.png" alt="Descriptive Alt Text">
+            <a href="https://github.com/omerbaktir/dailygraphtoemail/blob/main/queries/age_groups.sql">Query to get this result</a>     
         </div>
     </div>
 
