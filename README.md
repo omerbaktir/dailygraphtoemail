@@ -4,4 +4,4 @@ In this project I explained how I created a work flow to create daily graphs fro
 team memebrs as an email. I used several AWS services such as Lambda, EC2, IAM, S3, Event Bridge and SES.
 If you want to see all the details click the link to go to Github pages for this project:
 
-[Prpject Page](https://omerbaktir.github.io/dailygraphtoemail/)
+[Project Page](https://omerbaktir.github.io/dailygraphtoemail/)
